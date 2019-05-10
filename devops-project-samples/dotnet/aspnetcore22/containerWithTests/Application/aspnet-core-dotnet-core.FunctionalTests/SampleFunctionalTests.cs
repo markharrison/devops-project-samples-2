@@ -25,7 +25,7 @@ namespace SampleWebApplication.FunctionalTests
                 driver = GetChromeDriver();
                 var webAppUrl = testContext.Properties["webAppUrl"].ToString();
                 driver.Navigate().GoToUrl(webAppUrl);
-                Assert.AreEqual("Home Page - ASP.NET Core", driver.Title, "Expected title to be 'Home Page - ASP.NET Core'");
+                Assert.AreEqual("Home Page - ASP.NET Core 2.2", driver.Title, "Expected title to be 'Home Page - ASP.NET Core 2.2'");
             }
             finally
             {
