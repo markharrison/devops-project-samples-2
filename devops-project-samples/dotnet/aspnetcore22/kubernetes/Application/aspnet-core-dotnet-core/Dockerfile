@@ -1,19 +1,16 @@
-FROM mcr.microsoft.com/dotnet/core/aspnet:2.2-stretch-slim AS base
+FROM mcr.microsoft.com/dotnet/core/sdk:2.2-stretch AS build-env
 WORKDIR /app
-EXPOSE 80
 
-FROM mcr.microsoft.com/dotnet/core/sdk:2.2-stretch AS build
-WORKDIR /src
-COPY ["aspnet-core-dotnet-core/aspnet-core-dotnet-core.csproj", "aspnet-core-dotnet-core/"]
-RUN dotnet restore "aspnet-core-dotnet-core/aspnet-core-dotnet-core.csproj"
-COPY . .
-WORKDIR "/src/aspnet-core-dotnet-core"
-RUN dotnet build "aspnet-core-dotnet-core.csproj" -c Release -o /app
+# Copy csproj and restore as distinct layers
+COPY *.csproj ./
+RUN dotnet restore
 
-FROM build AS publish
-RUN dotnet publish "aspnet-core-dotnet-core.csproj" -c Release -o /app
+# Copy everything else and build
+COPY . ./
+RUN dotnet publish -c Release -o out
 
-FROM base AS final
+# Build runtime image
+FROM mcr.microsoft.com/dotnet/core/aspnet:2.2-stretch-slim 
 WORKDIR /app
-COPY --from=publish /app .
+COPY --from=build-env /app/out .
 ENTRYPOINT ["dotnet", "aspnet-core-dotnet-core.dll"]
